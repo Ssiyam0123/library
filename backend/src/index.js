@@ -1,7 +1,15 @@
 import express from "express"
+import "dotenv/config"
+import authRoute from "./routes/authRoutes.js";
+import { connectDb } from "./lib/db.js";
 
 const app = express();
 
-app.listen(3000,()=>{
-    console.log("server is running 4000");
+const PORT = process.env.PORT;
+
+app.use("/api/auth",authRoute);
+
+app.listen(PORT,()=>{
+    connectDb();
+    console.log(`server is running ${PORT}`);
 })
