@@ -3,7 +3,9 @@ import React, { useState } from "react";
 import { Link, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import { useAuthStore } from "../../store/authStore";
+import { useAuthStore } from "../../store/authStore.js";
+import { useLogin } from "../../hooks/useLogin.js";
+import { useRegister } from "../../hooks/useRegister.js";
 
 const AuthIndex = () => {
   const [loginPage, setLoginPage] = useState(true);
@@ -15,15 +17,44 @@ const AuthIndex = () => {
   const router = useRouter();
 
   const login = useAuthStore((s) => s.login);
+  const { mutate } = useLogin();
+  const { mutate: registerMutate, isPending: isRegistering } = useRegister();
 
-  const handleLogin = () => {
-    console.log(email, password);
-    login();
-  };
-  const handleSignUp = () => {
-    console.log(name, email, password);
-    login();
-  };
+
+const handleLogin = () => {
+  if (!email || !password) return;
+
+  mutate(
+    { email, password },
+    {
+      onSuccess: (data) => {
+        console.log("daata from fn : ",data)
+        login(data.user, data.token);
+      router.replace("/(tabs)");
+      },
+      onError: (error) => {
+        console.log(error.response?.data?.message || "Login failed");
+      },
+    }
+  );
+};
+
+const handleSignUp = () => {
+  if (!name || !email || !password) return;
+
+  registerMutate(
+    { username : name, email, password },
+    {
+      onSuccess: (data) => {
+        login(data.user, data.token);
+      },
+      onError: (error) => {
+        console.log(error.response?.data?.message || "Registration failed");
+      },
+    }
+  );
+};
+
 
   return (
     <View className="flex-1 bg-[#EEF8EE] items-center justify-center px-6">
@@ -38,15 +69,16 @@ const AuthIndex = () => {
 
       {/* Card */}
       <View className="w-full bg-white rounded-2xl p-6 shadow-lg">
-        <View>
-          <Text className="text-2xl font-bold text-center mb-6 text-green-700">
-            {" "}
-            BookWorm{" "}
-          </Text>
-          <Text className="text-center mb-6 text-gray-600">
-            Share your favourite reads
-          </Text>
-        </View>
+        {!loginPage && (
+          <View>
+            <Text className="text-2xl font-bold text-center mb-6 text-green-700">
+              BookWorm
+            </Text>
+            <Text className="text-center mb-6 text-gray-600">
+              Share your favourite reads
+            </Text>
+          </View>
+        )}
         {/* Name */}
         {!loginPage && (
           <View>

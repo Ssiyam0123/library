@@ -1,25 +1,22 @@
-import "../global.css";
-import { Stack, Redirect, useSegments } from "expo-router";
+import { Stack } from "expo-router";
 import { useAuthStore } from "../store/authStore";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 export default function RootLayout() {
-  const segments = useSegments();
   const isLogin = useAuthStore((s) => s.isLogin);
-
-  const isAuthGroup = segments[0] === "(auth)";
-
-  if (!isLogin && !isAuthGroup) {
-    return <Redirect href="/(auth)" />;
-  }
-
-  if (isLogin && isAuthGroup) {
-    return <Redirect href="/(tabs)" />;
-  }
+ 
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(auth)" />
-      <Stack.Screen name="(tabs)" />
-    </Stack>
+    <QueryClientProvider client={queryClient}>
+      <Stack screenOptions={{ headerShown: false }}>
+        {isLogin ? (
+          <Stack.Screen name="(tabs)" />
+        ) : (
+          <Stack.Screen name="(auth)" />
+        )}
+      </Stack>
+    </QueryClientProvider>
   );
 }
