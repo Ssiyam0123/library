@@ -20,41 +20,42 @@ const AuthIndex = () => {
   const { mutate } = useLogin();
   const { mutate: registerMutate, isPending: isRegistering } = useRegister();
 
+  console.log(process.env.EXPO_PUBLIC_API_URL)
 
-const handleLogin = () => {
-  if (!email || !password) return;
+  const handleLogin = () => {
+    if (!email || !password) return;
 
-  mutate(
-    { email, password },
-    {
-      onSuccess: (data) => {
-        console.log("daata from fn : ",data)
-        login(data.user, data.token);
-      router.replace("/(tabs)");
-      },
-      onError: (error) => {
-        console.log(error.response?.data?.message || "Login failed");
-      },
-    }
-  );
-};
+    mutate(
+      { email, password },
+      {
+        onSuccess: (data) => {
+          console.log("daata from fn : ", data);
+          login({ user: data?.user, token: data?.token });
+          router.replace("/(tabs)");
+        },
+        onError: (error) => {
+          console.log(error.response?.data?.message || "Login failed");
+        },
+      }
+    );
+  };
 
-const handleSignUp = () => {
-  if (!name || !email || !password) return;
+  const handleSignUp = () => {
+    if (!name || !email || !password) return;
 
-  registerMutate(
-    { username : name, email, password },
-    {
-      onSuccess: (data) => {
-        login(data.user, data.token);
-      },
-      onError: (error) => {
-        console.log(error.response?.data?.message || "Registration failed");
-      },
-    }
-  );
-};
-
+    registerMutate(
+      { username: name, email, password },
+      {
+        onSuccess: (data) => {
+          login({ user: data?.user, token: data?.token });
+          router.replace("/(tabs)");
+        },
+        onError: (error) => {
+          console.log(error.response?.data?.message || "Registration failed");
+        },
+      }
+    );
+  };
 
   return (
     <View className="flex-1 bg-[#EEF8EE] items-center justify-center px-6">
@@ -62,8 +63,8 @@ const handleSignUp = () => {
       {loginPage && (
         <Image
           source={require("../../assets/images/Bookshop-bro.png")}
+          contentFit="contain"
           style={{ width: 224, height: 224 }}
-          resizeMode="contain"
         />
       )}
 

@@ -1,16 +1,37 @@
-import { View, Text, TouchableOpacity } from 'react-native'
-import React from 'react'
-import { Link } from 'expo-router'
+import { View, FlatList, ActivityIndicator, Text } from "react-native";
+import BookReviewCard from "../../components/BookReviewCard";
+import { useBooks } from "../../hooks/useBooks.jsx";
 
-const index = () => {
+export default function Index() {
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+    useBooks();
+
+  const books = data?.pages.flatMap((page) => page.books) ?? [];
+  console.log(books);
+
+  if (isLoading) {
+    return <ActivityIndicator size="large" className="mt-10" />;
+  }
+  console.log(isFetchingNextPage);
   return (
-    <View>
-      <Text>index</Text>
-      <TouchableOpacity>
-        <Link href="/(auth)">Go to auth</Link>
-      </TouchableOpacity>
+    <View className="flex-1 bg-white">
+      <FlatList
+        data={books}
+        keyExtractor={(item) => item._id}
+        renderItem={({ item }) => <BookReviewCard book={item} />}
+        onEndReached={() => {
+          console.log("END REACHED");
+          if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+          }
+        }}
+        onEndReachedThreshold={0.6}
+        ListFooterComponent={
+          isFetchingNextPage ? (
+            <ActivityIndicator size="small" className="my-4" />
+          ) : null
+        }
+      />
     </View>
-  )
+  );
 }
-
-export default index
