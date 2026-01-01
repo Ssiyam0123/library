@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, TextInput } from "react-native";
+import { View, Text, TouchableOpacity, TextInput, ScrollView, Alert } from "react-native";
 import React, { useState } from "react";
 import { Link, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -35,6 +35,7 @@ const AuthIndex = () => {
         },
         onError: (error) => {
           console.log(error.response?.data?.message || "Login failed");
+          Alert.alert("error willie logging in", error.response?.data?.message || "Login failed");
         },
       }
     );
@@ -42,7 +43,7 @@ const AuthIndex = () => {
 
   const handleSignUp = () => {
     if (!name || !email || !password) return;
-
+    
     registerMutate(
       { username: name, email, password },
       {
@@ -52,13 +53,15 @@ const AuthIndex = () => {
         },
         onError: (error) => {
           console.log(error.response?.data?.message || "Registration failed");
+          Alert.alert("error willie registering", error.response?.data?.message || "Registration failed");
         },
       }
     );
   };
 
   return (
-    <View className="flex-1 bg-[#EEF8EE] items-center justify-center px-6">
+
+    <View className="flex-1 bg-[#EEF8EE] items-center justify-center px-6 h-screen">
       {/* Illustration */}
       {loginPage && (
         <Image

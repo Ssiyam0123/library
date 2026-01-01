@@ -1,7 +1,26 @@
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import { View, Text, Image, TouchableOpacity, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 const RecommendationCard = ({ book, onDelete }) => {
+  const handleDeletePress = () => {
+    Alert.alert(
+      "Delete Book",
+      "Are you sure you want to delete this book recommendation? This action cannot be undone.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => onDelete(book?._id),
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
   return (
     <View className="bg-[#F1FAF1] rounded-2xl p-3 mx-4 mb-3 flex-row items-center shadow-sm">
       
@@ -38,16 +57,16 @@ const RecommendationCard = ({ book, onDelete }) => {
         </Text>
 
         <Text className="text-xs text-gray-400 mt-1">
-          {book?.createdAt}
+          {new Date(book?.createdAt).toLocaleDateString()}
         </Text>
       </View>
 
-      {/* Delete */}
-      <TouchableOpacity onPress={() => onDelete(book?._id)}>
+      {/* Delete Button with Alert */}
+      <TouchableOpacity onPress={handleDeletePress}>
         <Ionicons
           name="trash-outline"
           size={20}
-          color="#6B7280"
+          color="#EF4444"
         />
       </TouchableOpacity>
     </View>

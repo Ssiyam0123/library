@@ -1,16 +1,19 @@
+// hooks/useCreateBook.js
 import { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
-import axios from "axios";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Alert } from "react-native";
 import { useAuthStore } from "../store/authStore";
-import { api } from "../lib/api.js";
+import { api } from "../lib/api";
+import { useRouter } from "expo-router";
 
 export const useCreateBook = () => {
   const [title, setTitle] = useState("");
   const [rating, setRating] = useState(0);
   const [image, setImage] = useState(null);
   const [caption, setCaption] = useState("");
+  const [isPosting, setIsPosting] = useState(false);
+  const router = useRouter()
 
   const token = useAuthStore((s) => s.token);
   const queryClient = useQueryClient();
@@ -18,7 +21,7 @@ export const useCreateBook = () => {
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1,
+      quality: 0.8,
     });
 
     if (!result.canceled) {
@@ -34,11 +37,14 @@ export const useCreateBook = () => {
       formData.append("title", bookData.title);
       formData.append("caption", bookData.caption);
       formData.append("rating", bookData.rating.toString());
-      formData.append("image", {
-        uri: bookData.image,
-        type: "image/jpeg",
-        name: "book.jpg",
-      });
+      
+      if (bookData.image) {
+        formData.append("image", {
+          uri: bookData.image,
+          type: "image/jpeg",
+          name: "book.jpg",
+        });
+      }
 
       const res = await api.post("/books", formData, {
         headers: {
@@ -49,22 +55,34 @@ export const useCreateBook = () => {
 
       return res.data;
     },
-    onSuccess: () => {
-      Alert.alert("Success", "Book posted!");
+    onMutate: () => {
+      setIsPosting(true);
+      return { isPosting: true };
+    },
+    onSuccess: (data) => {
+      Alert.alert("Success", "Book posted successfully!");
+      
+      queryClient.invalidateQueries({ queryKey: ["books"] });
+      queryClient.invalidateQueries({ queryKey: ["userBooks"] });
+      
       setTitle("");
       setCaption("");
       setImage(null);
       setRating(0);
-      queryClient.invalidateQueries(["books"]);
+      router.replace("/(tabs)/profile");
     },
     onError: (error) => {
-      Alert.alert("Error", error.response?.data?.message || error.message);
+      Alert.alert("Error", error.response?.data?.message || "Failed to post");
+    },
+    onSettled: () => {
+      setIsPosting(false);
     },
   });
 
   const handleSubmit = () => {
     if (!title || !caption || !rating || !image) {
-      return Alert.alert("Error", "Please fill all fields");
+      Alert.alert("Error", "Please fill all fields");
+      return;
     }
     mutation.mutate({ title, caption, rating, image });
   };
@@ -79,6 +97,7 @@ export const useCreateBook = () => {
     setCaption,
     pickImage,
     handleSubmit,
+    isPosting,
     isLoading: mutation.isLoading,
   };
 };

@@ -1,10 +1,10 @@
 import { View, Text, ScrollView } from "react-native";
 import React from "react";
-import { useAuthStore } from "../../store/authStore";
-import UserProfileCard from "../../components/UserProfileCard";
-import RecommendationCard from "../../components/RecommendationCard";
-import { useUserBook } from "../../hooks/useUserBook";
-import { useDeleteBook } from "../../hooks/useDeleteBook";
+import { useAuthStore } from "../../store/authStore.js";
+import UserProfileCard from "../../components/UserProfileCard.jsx";
+import RecommendationCard from "../../components/RecommendationCard.jsx";
+import { useUserBook } from "../../hooks/useUserBook.jsx";
+import { useDeleteBook } from "../../hooks/useDeleteBook.js";
 
 const ProfilePage = () => {
   const user = useAuthStore((s) => s.user);
