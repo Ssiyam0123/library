@@ -1,30 +1,24 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-import validator from "validator";
 
 const userSchema = new mongoose.Schema(
   {
     username: {
       type: String,
       required: true,
-      trim: true,
+      unique: true,
     },
-
     email: {
       type: String,
       required: true,
       unique: true,
-      lowercase: true,
-      validate: [validator.isEmail, "Invalid email"],
     },
-
     password: {
       type: String,
       required: true,
-      minlength: 4,
+      minlength: 6,
     },
-
-    profilePicture: {
+    profileImage: {
       type: String,
       default: "",
     },
@@ -32,18 +26,20 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-/* 🔐 Hash password before save */
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  this.password = await bcrypt.hash(this.password, 10);
-  // next();
+// hash password before saving user to db
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
+
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
-/* 🔑 Password compare method */
-userSchema.methods.comparePassword = async function (password) {
-  return bcrypt.compare(password, this.password);
+
+// compare password func
+userSchema.methods.comparePassword = async function (userPassword) {
+  return await bcrypt.compare(userPassword, this.password);
 };
 
-const User = mongoose.model("User", userSchema);
-export default User;
+const User = mongoose.models.User || mongoose.model("User", userSchema);
 
+export default User;

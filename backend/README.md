@@ -13,7 +13,7 @@ This repository provides a clean and scalable foundation for building REST APIs 
 * 🧩 Modular folder structure
 * 🌱 Environment variable support (`.env`)
 * 🛡 Ready for middleware (auth, validation, logging)
-* 🔌 Easy to plug in databases (MongoDB, PostgreSQL, etc.)
+* 🔌 Default plugged in databases (MongoDB)
 
 ---
 
@@ -50,7 +50,7 @@ NODE_ENV=development
 ## ▶️ Run the Server
 
 ```bash
-bun run src/index.ts
+bun run dev
 ```
 
 Server will start at:
@@ -66,12 +66,11 @@ http://localhost:5000
 ```
 .
 ├── src
-│   ├── index.ts          # App entry point
-│   ├── app.ts            # Express app config
+│   ├── index.js          # App entry point
+│   ├── lib/              # Library config
 │   ├── routes/           # API routes
-│   ├── controllers/      # Controller logic
+│   ├── models/           # Database models logic
 │   ├── middlewares/      # Custom middlewares
-│   └── utils/            # Helpers / utilities
 ├── .env.sample
 ├── package.json
 ├── tsconfig.json
@@ -82,118 +81,22 @@ http://localhost:5000
 
 ## 🔗 API Endpoints
 
-Below are **example REST API endpoints** included / expected in this starter.
-You can extend or modify them as needed.
+### Authentication
 
-### 🩺 Health Check
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/register` | Register a new user |
+| POST | `/api/auth/login` | Login user |
 
-| Method | Endpoint      | Description         |
-| ------ | ------------- | ------------------- |
-| GET    | `/api/health` | Check server status |
+### Books
 
-**Response:**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/books` | Create a new book (protected) |
+| GET | `/api/books` | Get all books with pagination (protected) |
+| GET | `/api/books/user` | Get books by logged-in user (protected) |
+| DELETE | `/api/books/:id` | Delete a book by ID (protected) |
 
-```json
-{
-  "status": "ok",
-  "message": "Server is running"
-}
-```
-
----
-
-### 👤 Users API (Example)
-
-#### Get all users
-
-```
-GET /api/users
-```
-
-**Response:**
-
-```json
-[
-  {
-    "id": "1",
-    "name": "John Doe",
-    "email": "john@example.com"
-  }
-]
-```
-
-#### Get user by ID
-
-```
-GET /api/users/:id
-```
-
-#### Create user
-
-```
-POST /api/users
-```
-
-**Body:**
-
-```json
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "123456"
-}
-```
-
----
-
-### 🔐 Auth API (Optional / Extendable)
-
-#### Register
-
-```
-POST /api/auth/register
-```
-
-#### Login
-
-```
-POST /api/auth/login
-```
-
-**Response:**
-
-```json
-{
-  "token": "jwt_token_here",
-  "user": {
-    "id": "1",
-    "email": "john@example.com"
-  }
-}
-```
-
----
-
-## 🧠 How to Add New Endpoints
-
-1. Create a route file in `src/routes/`
-2. Add controller logic in `src/controllers/`
-3. Register the route in `app.ts`
-
-Example:
-
-```ts
-router.get('/products', getProducts);
-```
-
----
-
-## 🛠 Best Practices
-
-* Use **Zod/Joi** for request validation
-* Use **JWT** for authentication
-* Separate business logic into services
-* Add error-handling middleware
 
 ---
 

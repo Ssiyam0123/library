@@ -1,82 +1,104 @@
 import express from "express";
-import User from "../models/user.js";
-import generateToken from "../utils/generateToken.js";
+import User from "../models/user.js"
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
-/* ================= REGISTER ================= */
+const generateToken = (userId) => {
+ // console.log("user id from token : ",userId);
+  return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "15d" });
+};
+
 router.post("/register", async (req, res) => {
   try {
-    const { username, email, password, profilePicture } = req?.body;
-//      console.log("HEADERS:", req.headers);
-//   console.log("BODY:", req.body);
+    const { email, username, password } = req.body;
+
+   // console.log(email, username, password)
 
     if (!username || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(409).json({ message: "User already exists" });
+    if (password.length < 6) {
+      return res.status(400).json({ message: "Password should be at least 6 characters long" });
     }
 
-    const user = await User.create({
-      username,
+    if (username.length < 3) {
+      return res.status(400).json({ message: "Username should be at least 3 characters long" });
+    }
+
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
+
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+      return res.status(400).json({ message: "Username already exists" });
+    }
+
+    // get random avatar
+    const profileImage = `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`;
+
+    const user = new User({
       email,
+      username,
       password,
-      profilePicture,
+      profileImage,
     });
+
+    await user.save();
 
     const token = generateToken(user._id);
 
+   // console.log(user)
+
     res.status(201).json({
-      message: "User registered successfully",
       token,
       user: {
         id: user._id,
         username: user.username,
         email: user.email,
+        profileImage: user.profileImage,
+        createdAt: user.createdAt,
       },
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
-    
+   // console.log("Error in register route", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
-/* ================= LOGIN ================= */
 router.post("/login", async (req, res) => {
   try {
-    const { email, password } = req?.body;
+    const { email, password } = req.body;
+   // console.log(email, password)
 
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password required" });
-    }
+    if (!email || !password) return res.status(400).json({ message: "All fields are required" });
 
+    // check if user exists
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
+    if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
+    // check if password is correct
+    const isPasswordCorrect = await user.comparePassword(password);
+    if (!isPasswordCorrect) return res.status(400).json({ message: "Invalid credentials" });
 
     const token = generateToken(user._id);
-
+   // console.log(user)
     res.status(200).json({
-      message: "Login successful",
       token,
       user: {
         id: user._id,
         username: user.username,
         email: user.email,
+        profileImage: user.profileImage,
+        createdAt: user.createdAt,
       },
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+   // console.log("Error in login route", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
