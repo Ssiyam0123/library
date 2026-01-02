@@ -20,7 +20,7 @@ const AuthIndex = () => {
   const { mutate } = useLogin();
   const { mutate: registerMutate, isPending: isRegistering } = useRegister();
 
-  console.log(process.env.EXPO_PUBLIC_API_URL)
+  // console.log(process.env.EXPO_PUBLIC_API_URL)
 
   const handleLogin = () => {
     if (!email || !password) return;
@@ -29,12 +29,12 @@ const AuthIndex = () => {
       { email, password },
       {
         onSuccess: (data) => {
-          console.log("daata from fn : ", data);
+          // console.log("daata from fn : ", data);
           login({ user: data?.user, token: data?.token });
           router.replace("/(tabs)");
         },
         onError: (error) => {
-          console.log(error.response?.data?.message || "Login failed");
+          // console.log(error.response?.data?.message || "Login failed");
           Alert.alert("error willie logging in", error.response?.data?.message || "Login failed");
         },
       }

@@ -10,7 +10,7 @@ const UserProfileCard = ({ user, onLogout }) => {
     logOut();
     router.replace("/(auth)");
   }
-  console.log(user);
+  // console.log(user);
   return (
     <View className="bg-[#F1FAF1] rounded-2xl p-4 mx-4 mt-4 shadow-sm">
       {/* User Info */}

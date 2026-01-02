@@ -2,7 +2,7 @@ import { View, Text, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 const BookReviewCard = ({ book }) => {
-  console.log(book)
+  // console.log(book)
   return (
     <View className="bg-[#F1FAF1] rounded-2xl p-4 mb-4 w-[95%] mx-auto">
       
@@ -42,12 +42,12 @@ const BookReviewCard = ({ book }) => {
 
       {/* Caption */}
       <Text className="text-gray-600 text-sm mb-2">
-        {book.caption}
+        {book?.caption}
       </Text>
 
       {/* Date */}
       <Text className="text-xs text-gray-400">
-        {new Date(book.createdAt).toLocaleDateString()}
+        {new Date(book?.createdAt).toLocaleDateString()}
       </Text>
     </View>
   );

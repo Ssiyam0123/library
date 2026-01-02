@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 
-console.log('🔍 Checking Tailwind Setup...\n');
+// console.log('🔍 Checking Tailwind Setup...\n');
 
 // Check files
 const files = [
@@ -15,17 +15,17 @@ const files = [
 
 files.forEach(file => {
   const exists = fs.existsSync(path.join(__dirname, file));
-  console.log(`${exists ? '✅' : '❌'} ${file} ${exists ? 'found' : 'missing'}`);
+  // console.log(`${exists ? '✅' : '❌'} ${file} ${exists ? 'found' : 'missing'}`);
 });
 
 // Check package.json
 try {
   const pkg = require('./package.json');
-  console.log('\n📦 Dependencies:');
-  console.log(`✅ nativewind: ${pkg.dependencies?.nativewind || 'NOT FOUND'}`);
-  console.log(`✅ tailwindcss: ${pkg.dependencies?.tailwindcss || 'NOT FOUND'}`);
+  // console.log('\n📦 Dependencies:');
+  // console.log(`✅ nativewind: ${pkg.dependencies?.nativewind || 'NOT FOUND'}`);
+  // console.log(`✅ tailwindcss: ${pkg.dependencies?.tailwindcss || 'NOT FOUND'}`);
 } catch (e) {
-  console.log('❌ Cannot read package.json');
+  // console.log('❌ Cannot read package.json');
 }
-
+// 
 console.log('\n🔄 Run: npx expo start --clear');

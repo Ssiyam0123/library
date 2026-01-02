@@ -1,4 +1,3 @@
-// hooks/useCreateBook.js
 import { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
