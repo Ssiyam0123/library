@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 const router = express.Router();
 
 const generateToken = (userId) => {
-  console.log("user id from token : ",userId);
+ // console.log("user id from token : ",userId);
   return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "15d" });
 };
 
@@ -13,7 +13,7 @@ router.post("/register", async (req, res) => {
   try {
     const { email, username, password } = req.body;
 
-    console.log(email, username, password)
+   // console.log(email, username, password)
 
     if (!username || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
@@ -27,7 +27,6 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ message: "Username should be at least 3 characters long" });
     }
 
-    // check if user already exists
     const existingEmail = await User.findOne({ email });
     if (existingEmail) {
       return res.status(400).json({ message: "Email already exists" });
@@ -52,7 +51,7 @@ router.post("/register", async (req, res) => {
 
     const token = generateToken(user._id);
 
-    console.log(user)
+   // console.log(user)
 
     res.status(201).json({
       token,
@@ -65,7 +64,7 @@ router.post("/register", async (req, res) => {
       },
     });
   } catch (error) {
-    console.log("Error in register route", error);
+   // console.log("Error in register route", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
@@ -73,7 +72,7 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(email, password)
+   // console.log(email, password)
 
     if (!email || !password) return res.status(400).json({ message: "All fields are required" });
 
@@ -86,7 +85,7 @@ router.post("/login", async (req, res) => {
     if (!isPasswordCorrect) return res.status(400).json({ message: "Invalid credentials" });
 
     const token = generateToken(user._id);
-    console.log(user)
+   // console.log(user)
     res.status(200).json({
       token,
       user: {
@@ -98,7 +97,7 @@ router.post("/login", async (req, res) => {
       },
     });
   } catch (error) {
-    console.log("Error in login route", error);
+   // console.log("Error in login route", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });

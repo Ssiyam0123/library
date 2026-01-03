@@ -11,14 +11,13 @@ const upload = multer({ storage });
 router.post("/", protectRoute, upload.single("image"), async (req, res) => {
   try {
     const { title, caption, rating } = req.body;
-    console.log(title)
     const file = req.file;
 
     if (!file || !title || !caption || !rating) {
       return res.status(400).json({ message: "Please provide all fields" });
     }
 
-    // upload file buffer to cloudinary
+    // upload file to cloudinary
     const uploadResponse = await cloudinary.uploader.upload_stream(
       { folder: "books" },
       async (error, result) => {
@@ -31,16 +30,14 @@ router.post("/", protectRoute, upload.single("image"), async (req, res) => {
           image: result.secure_url,
           user: req.user._id,
         });
-        console.log(newBook);
+       // console.log(newBook);
         await newBook.save();
         res.status(201).json(newBook);
       }
     );
-
-    // pipe the buffer to Cloudinary
     uploadResponse.end(file.buffer);
   } catch (error) {
-    console.log("Error creating book", error);
+   // console.log("Error creating book", error);
     res.status(500).json({ message: error.message });
   }
 });
@@ -61,8 +58,6 @@ router.get("/", protectRoute, async (req, res) => {
       .populate("user", "username profileImage");
 
     const totalBooks = await Book.countDocuments();
-    console.log("toal books : ",totalBooks);
-    console.log("current books : ",books.length);
 
     res.send({
       books,
@@ -71,7 +66,7 @@ router.get("/", protectRoute, async (req, res) => {
       totalPages: Math.ceil(totalBooks / limit),
     });
   } catch (error) {
-    console.log("Error in get all books route", error);
+   // console.log("Error in get all books route", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
@@ -84,7 +79,7 @@ router.get("/user", protectRoute, async (req, res) => {
     });
     res.json(books);
   } catch (error) {
-    console.error("Get user books error:", error.message);
+   // console.error("Get user books error:", error.message);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -98,24 +93,21 @@ router.delete("/:id", protectRoute, async (req, res) => {
     if (book.user.toString() !== req.user._id.toString())
       return res.status(401).json({ message: "Unauthorized" });
 
-    // https://res.cloudinary.com/de1rm4uto/image/upload/v1741568358/qyup61vejflxxw8igvi0.png
-    // delete image from cloduinary as well
     if (book.image && book.image.includes("cloudinary")) {
       try {
         const publicId = book.image.split("/").pop().split(".")[0];
         const res =await cloudinary.uploader.destroy(publicId);
-        console.log(res)
+       // console.log(res)
       } catch (deleteError) {
-        console.log("Error deleting image from cloudinary", deleteError);
+       // console.log("Error deleting image from cloudinary", deleteError);
       }
     }
 
-    const result = await book.deleteOne();
-    console.log(result)
+    await book.deleteOne();
 
     res.json({ message: "Book deleted successfully" });
   } catch (error) {
-    console.log("Error deleting book", error);
+   // console.log("Error deleting book", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });

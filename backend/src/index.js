@@ -4,12 +4,10 @@ import authRoute from "./routes/authRoutes.js";
 import bookRoute from "./routes/bookRoutes.js"
 import { connectDb } from "./lib/db.js";
 import cors from 'cors'
-import cookieParser from "cookie-parser"
-// import job from "./lib/corn.js";
 
 const app = express();
 
-// job.start();
+
 app.use(express.json());
 app.use(cors());
 
